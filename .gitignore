@@ -1,0 +1,6 @@
+# terraform実行時に作成されるファイルは対象外
+/.terraform
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.tfstate.lock.info

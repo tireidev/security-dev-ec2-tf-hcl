@@ -1,0 +1,1 @@
+variable "u_vpc_id" {}
