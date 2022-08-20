@@ -13,15 +13,16 @@ Session Managerを利用して以下を実現する。
 2. ローカル端末からプライベートサブネット上のEC2インスタンス上にインストールしたNginxにHTTP接続する。
 
 ## システム構成図
-構築するシステム構成は以下の通り
-「VPC Endpoint Network Interface」は以下の3つのエンドポイントを利用する。
+構築するシステム構成は以下の通り<br>
+黒線がデータの流れを示し、点線がデータ制御を示す。<br>
+「VPC Endpoint Network Interface」は以下の3つのエンドポイントを利用する。<br>
 このエンドポイントはSession Managerと通信を行うために利用する。SSM AgentよりHTTPSのインバウンドルールを有効にすることで、Session Managerと通信を行うことが可能。
 1. com.amazonaws.ap-northeast-1.ssm
 2. com.amazonaws.ap-northeast-1.ssmmessages
 3. com.amazonaws.ap-northeast-1.ec2messages
 
-「VPC Endpoint Gateway」は以下のエンドポイントを利用する。
-このエンドポイントはS3となっているが、これを利用することで、エンドポイントから外部の環境にアクセスすることが出来、「yum update」等のコマンドを実行することが可能となる。
+「VPC Endpoint Gateway」は以下のエンドポイントを利用する。<br>
+以下のエンドポイントを利用することで、Amazon Linux2 AMI リポジトリをホストする S3 バケットへのトラフィックを許可することが出来、そのリポジトリに対して「yum update」等のコマンドを実行することが可能となる。
 1. com.amazonaws.ap-northeast-1.s3
 
 <img src="./img/sec_dev_ec2.jpg" alt="AWSシステム構成" title="AWSシステム構成">
