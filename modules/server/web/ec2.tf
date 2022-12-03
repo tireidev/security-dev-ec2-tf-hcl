@@ -6,7 +6,7 @@
 # EC2インスタンス構築
 #
 # [引数]
-# 変数名: u_private_subnet_id
+# 変数名: u_web_private_subnet_1a_id
 # 値: プライベートサブネットID
 # 
 # 変数名: u_ec2_sg_id
@@ -23,7 +23,7 @@
 resource "aws_instance" "server" {
   ami                    = "ami-00d101850e971728d"
   instance_type          = "t2.micro"
-  subnet_id              = var.u_private_subnet_id
+  subnet_id              = var.u_web_private_subnet_1a_id
   vpc_security_group_ids = [var.u_ec2_sg_id]
   key_name               = var.u_key_name
   user_data = file("${path.module}/script.sh")

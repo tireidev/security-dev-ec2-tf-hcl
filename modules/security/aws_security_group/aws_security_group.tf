@@ -4,9 +4,6 @@
 # 
 # [概要]
 # セキュリティグループ構築
-# ・インバウンドルール
-#    接続元:MyIP
-#    ポート:443(TCP)
 #
 # [引数]
 # 変数名: u_vpc_id
@@ -14,10 +11,14 @@
 # 
 # [output]
 # 変数名: prj_dev_vpc_endpoint_sg_id
-# 値: VPCエンドポイントのセキュリティグループ
+# 値: VPCエンドポイントのセキュリティグループのID
 #
 # 変数名: prj_dev_ec2_sg_id
-# 値: EC2インスタンスのセキュリティグループ
+# 値: EC2インスタンスのセキュリティグループのID
+#
+# 変数名: prj_dev_db_sg_id
+# 値: RDSインスタンスのセキュリティグループのID
+#
 # ========================================================== #
 
 # ========================================================== #
@@ -82,4 +83,37 @@ resource "aws_security_group_rule" "all_outbound" {
 # EC2インスタンスのセキュリティグループ
 output "prj_dev_ec2_sg_id" {
   value = "${aws_security_group.prj_dev_ec2_sg.id}"
+}
+
+# ========================================================== #
+#   RDSのセキュリティグループ
+# ========================================================== #
+resource "aws_security_group" "prj_dev_db_sg" {
+  name        = "prj_dev_db_sg"
+  description = "Allow traffic."
+  vpc_id      = var.u_vpc_id
+
+  tags = {
+    Env = "dev"
+    Name = "prj_dev_db_sg"
+  }
+  # インバウンドルールはaws_security_group_ruleにて定義
+}
+
+# 5432番ポート許可のインバウンドルール
+resource "aws_security_group_rule" "ingress_allow_5432" {
+  type        = "ingress"
+  from_port   = 5432
+  to_port     = 5432
+  protocol    = "tcp"
+  # cidr_blocks = ["10.0.0.0/16"]
+  source_security_group_id  = aws_security_group.prj_dev_ec2_sg.id
+
+  # セキュリティグループと紐付け
+  security_group_id = "${aws_security_group.prj_dev_db_sg.id}"
+}
+
+# RDSのセキュリティグループ
+output "prj_dev_db_sg_id" {
+  value = "${aws_security_group.prj_dev_db_sg.id}"
 }

@@ -9,6 +9,15 @@
 # 変数名: u_vpc_ip_ip4
 # 値: 10.0.0.0/16
 # 
+# 変数名: u_web_private_subnet_1a_id
+# 値: WEBサーバ用プライベートサブネット(ap-northeast-1a)のIPアドレス
+# 
+# 変数名: u_vpc_endpoint_sg_id
+# 値: VPCエンドポイント(Interface型)のセキュリティグループのID
+# 
+# 変数名: u_vpc_endpoint_route_table_id
+# 値: VPCエンドポイント(Interface型)のルートテーブルのID
+# 
 # [output]
 # なし
 # ========================================================== #
@@ -31,7 +40,7 @@ resource "aws_vpc_endpoint" "ssm" {
   service_name      = "com.amazonaws.ap-northeast-1.ssm"
   policy            = data.aws_iam_policy_document.vpc_endpoint.json
   subnet_ids = [
-    var.u_private_subnet_id
+    var.u_web_private_subnet_1a_id
   ]
   private_dns_enabled = true
   security_group_ids = [
@@ -45,7 +54,7 @@ resource "aws_vpc_endpoint" "ssmmessages" {
   service_name      = "com.amazonaws.ap-northeast-1.ssmmessages"
   policy            = data.aws_iam_policy_document.vpc_endpoint.json
   subnet_ids = [
-    var.u_private_subnet_id
+    var.u_web_private_subnet_1a_id
   ]
   private_dns_enabled = true
   security_group_ids = [
@@ -59,7 +68,7 @@ resource "aws_vpc_endpoint" "ec2messages" {
   service_name      = "com.amazonaws.ap-northeast-1.ec2messages"
   policy            = data.aws_iam_policy_document.vpc_endpoint.json
   subnet_ids = [
-    var.u_private_subnet_id
+    var.u_web_private_subnet_1a_id
   ]
   private_dns_enabled = true
   security_group_ids = [

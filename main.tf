@@ -17,7 +17,9 @@
 #   2.1. IAM作成
 #   2.2. セキュリティグループ構築
 #   2.3. キーペア構築 ※EC2インスタンスのSSH接続で利用するため
+#   2.4. キーペア構築 ※EC2インスタンスにローカルマシンにてSSH接続でするため
 # 3. EC2インスタンス構築
+# 4. RDSインスタンス構築
 # ========================================================== #
 
 # ========================================================== #
@@ -59,7 +61,9 @@ module "aws_route_table" {
 # ========================================================== #
 module "aws_subnet" {
   u_vpc_id            = module.aws_vpc.id
-  u_private_subnet_ip = var.u_private_subnet_ip
+  u_web_private_subnet_1a_ip = var.u_web_private_subnet_1a_ip
+  u_db_private_subnet_1a_ip = var.u_db_private_subnet_1a_ip
+  u_db_private_subnet_1c_ip = var.u_db_private_subnet_1c_ip
   source              = "./modules/network/aws_subnet"
 }
 
@@ -68,7 +72,9 @@ module "aws_subnet" {
 # ========================================================== #
 module "aws_route_table_association" {
   u_aws_route_table_id = module.aws_route_table.id
-  u_private_subnet_id  = module.aws_subnet.private_subnet_id
+  u_web_private_subnet_1a_id  = module.aws_subnet.web_private_subnet_1a_id
+  u_db_private_subnet_1a_id  = module.aws_subnet.db_private_subnet_1a_id
+  u_db_private_subnet_1c_id  = module.aws_subnet.db_private_subnet_1c_id
   source               = "./modules/network/aws_route_table_association"
 }
 
@@ -95,7 +101,7 @@ module "aws_security_group" {
 module "aws_vpc_endpoint" {
   source                        = "./modules/network/aws_vpc_endpoint"
   u_vpc_id                      = module.aws_vpc.id
-  u_private_subnet_id           = module.aws_subnet.private_subnet_id
+  u_web_private_subnet_1a_id           = module.aws_subnet.web_private_subnet_1a_id
   u_vpc_endpoint_sg_id          = module.aws_security_group.prj_dev_vpc_endpoint_sg_id
   u_vpc_endpoint_route_table_id = module.aws_route_table.id
 }
@@ -114,8 +120,18 @@ module "aws_key_pairs" {
 # 3. EC2インスタンス構築
 # ========================================================== #
 module "ec2" {
-  source                  = "./modules/server"
-  u_private_subnet_id     = module.aws_subnet.private_subnet_id
+  source                  = "./modules/server/web"
+  u_web_private_subnet_1a_id     = module.aws_subnet.web_private_subnet_1a_id
   u_ec2_sg_id             = module.aws_security_group.prj_dev_ec2_sg_id
   u_key_name              = module.aws_key_pairs.key_name
+}
+
+# ========================================================== #
+# 4. RDSインスタンス構築
+# ========================================================== #
+module "rds" {
+  source                  = "./modules/server/db"
+  u_db_private_subnet_1a_id     = module.aws_subnet.db_private_subnet_1a_id
+  u_db_private_subnet_1c_id     = module.aws_subnet.db_private_subnet_1c_id
+  u_db_sg_id             = module.aws_security_group.prj_dev_db_sg_id
 }
