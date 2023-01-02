@@ -9,3 +9,17 @@ variable "u_private_key_name" {}
 variable "u_public_key_name" {}
 variable "u_instance_profile_name" {}
 variable "u_internet_gateway_id" {}
+variable "vpc_setting" {
+  type        = map(map(string))
+  description = ""
+  default = {
+    "default" = {
+      "cidr" = null
+      "instance_tenancy" = null
+      "enable_dns_support" = true
+      "enable_dns_hostnames" = true
+      "env" = null
+      "name" = null
+    }
+  }
+}
