@@ -4,7 +4,7 @@
 # ========================================================== #
 
 resource "aws_vpc" "default" {
-  count = var.u_count
+  # count = var.u_count
   cidr_block       = var.u_vpc_ip_ip4
   instance_tenancy = var.u_instance_tenancy
   enable_dns_support   = var.u_enable_dns_support 
@@ -17,6 +17,8 @@ resource "aws_vpc" "default" {
 
 }
 
-output "id" {
-  value = "${aws_vpc.default.*.id}"
-}
+# output "vpc_id" {
+#   # value = [ for value in aws_vpc.default : value.id ]
+#   # 以下でもOK
+#   value = "${aws_vpc.default.id}"
+# }

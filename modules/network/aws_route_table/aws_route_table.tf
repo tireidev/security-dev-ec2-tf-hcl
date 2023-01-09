@@ -20,8 +20,8 @@
 resource "aws_route_table" "prj_dev_route_table" {
   vpc_id = var.u_vpc_id
   tags = {
-    Env = "dev"
-    Name = "prj_dev_route_table"
+    Env = var.u_env
+    Name = var.u_name
   }
 }
 

@@ -9,21 +9,35 @@ u_private_key_name         = "hanson_key.pem"
 u_public_key_name          = "hanson_key.pem.pub"
 u_instance_profile_name    = ""
 u_internet_gateway_id      = ""
-# vpc_setting = {
-#   prj-prd-vpc = {
-#     "cidr"                 = "10.0.0.0/16"
-#     "instance_tenancy"     = "default"
-#     "enable_dns_support"   = true
-#     "enable_dns_hostnames" = true
-#     "env" = "prd"
-#     "name" = "prj-prd-vpc"
-#   }
-#   prj-stg-vpc = {
-#     "cidr"                 = "10.1.0.0/16"
-#     "instance_tenancy"     = "default"
-#     "enable_dns_support"   = true
-#     "enable_dns_hostnames" = true
-#     "env" = "stg"
-#     "name" = "prj-stg-vpc"
-#   }
-# }
+
+vpc_setting = {
+  prj-prd-vpc = {
+    cidr                 = "10.0.0.0/16"
+    instance_tenancy     = "default"
+    enable_dns_support   = true
+    enable_dns_hostnames = true
+    env                  = "prd"
+    name                 = "prj-prd-vpc"
+  }
+  prj-stg-vpc = {
+    cidr                 = "10.1.0.0/16"
+    instance_tenancy     = "default"
+    enable_dns_support   = true
+    enable_dns_hostnames = true
+    env                  = "stg"
+    name                 = "prj-stg-vpc"
+  }
+}
+
+route_tables = {
+  prj-prd-web-route_table = {
+    vpc_name = "prj-prd-vpc"
+    env      = "prd"
+    name     = "prj-prd-web-route_table"
+  }
+  prj-prd-db-route_table = {
+    vpc_name = "prj-prd-vpc"
+    env      = "prd"
+    name     = "prj-prd-db-route_table"
+  }
+}

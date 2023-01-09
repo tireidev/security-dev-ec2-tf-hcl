@@ -13,13 +13,25 @@ variable "vpc_setting" {
   type        = map(map(string))
   description = ""
   default = {
-    "default" = {
-      "cidr" = null
-      "instance_tenancy" = null
-      "enable_dns_support" = true
-      "enable_dns_hostnames" = true
-      "env" = null
-      "name" = null
+    default = {
+      key                  = null
+      cidr                 = null
+      instance_tenancy     = null
+      enable_dns_support   = true
+      enable_dns_hostnames = true
+      env                  = null
+      name                 = null
+    }
+  }
+}
+variable "route_tables" {
+  type        = map(map(string))
+  description = ""
+  default = {
+    default = {
+      vpc_name = null
+      env      = null
+      name     = null
     }
   }
 }

@@ -46,22 +46,25 @@ provider "aws" {
 module "aws_vpc" {
   source                 = "./modules/network/aws_vpc"
   for_each               = var.vpc_setting
-  u_count = lookup(each.value, "cidr") == null ? 0 : 1
-  u_vpc_ip_ip4           = lookup(each.value, "cidr")
-  u_instance_tenancy     = lookup(each.value, "instance_tenancy")
-  u_enable_dns_support   = lookup(each.value, "enable_dns_support")
-  u_enable_dns_hostnames = lookup(each.value, "enable_dns_hostnames")
-  u_env = lookup(each.value, "env")
-  u_name = lookup(each.value, "name")
+  u_name                 = each.value.name
+  u_env                  = each.value.env
+  u_vpc_ip_ip4           = each.value.cidr
+  u_instance_tenancy     = each.value.instance_tenancy
+  u_enable_dns_support   = each.value.enable_dns_support
+  u_enable_dns_hostnames = each.value.enable_dns_hostnames
+
 }
 
 # ========================================================== #
 #   1.2. RouteTable構築
 # ========================================================== #
-# module "aws_route_table" {
-#   u_vpc_id = module.aws_vpc.id
-#   source   = "./modules/network/aws_route_table"
-# }
+module "aws_route_table" {
+  source   = "./modules/network/aws_route_table"
+  for_each = var.route_tables
+  u_name   = each.value.name
+  u_env    = each.value.env
+  u_vpc_id = module.aws_vpc["${each.value.vpc_name}"].vpc_id
+}
 
 # ========================================================== #
 #   1.3. Subnet構築
