@@ -1,3 +1,3 @@
-variable "u_vpc_id" {}
-variable "u_env" {}
-variable "u_name" {}
+variable "vpc_id" {}
+variable "env" {}
+variable "Name" {}
