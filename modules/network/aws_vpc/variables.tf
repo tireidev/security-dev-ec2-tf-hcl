@@ -1,1 +1,7 @@
-variable "u_vpc_ip_ip4" {}
+# variable "u_count" {}
+variable "cidr_block" {}
+variable "instance_tenancy" {}
+variable "enable_dns_support" {}
+variable "enable_dns_hostnames" {}
+variable "env" {}
+variable "Name" {}
