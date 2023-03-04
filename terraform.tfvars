@@ -61,6 +61,7 @@ subnets = {
 }
 
 aws_security_groups = {
+
   vpc_endpoint_sg = {
     Name       = "prj-dev-vpc-endpoint-sg"
     description = "Allow https traffic."
@@ -73,28 +74,30 @@ aws_security_groups = {
       cidr_blocks = "10.0.0.0/16"
     }
   }
-  # vpc_ec2_sg = {
-  #   Name       = "prj_dev_ec2_sg"
-  #   description = "Allow all outbound traffic."
-  #   env        = "prd"
-  #   rules = {
-  #     type = "egress",
-  #     from_port = "0",
-  #     to_port = "0",
-  #     protocol = "-1",
-  #     cidr_blocks = "0.0.0.0/0"
-  #   }
-  # }
-  # vpc_db_sg = {
-  #   Name       = "prj_dev_db_sg"
-  #   description = "Allow traffic."
-  #   env        = "prd"
-  #   rules = {
-  #     type = "ingress",
-  #     from_port = "5432",
-  #     to_port = "5432",
-  #     protocol = "tcp",
-  #     cidr_blocks = "10.0.0.0/16"
-  #   }
-  # }
+
+  vpc_ec2_sg = {
+    Name       = "prj_dev_ec2_sg"
+    description = "Allow all outbound traffic."
+    env        = "prd"
+    rules = {
+      type = "egress",
+      from_port = "0",
+      to_port = "0",
+      protocol = "-1",
+      cidr_blocks = "0.0.0.0/0"
+    }
+  }
+  
+  vpc_db_sg = {
+    Name       = "prj_dev_db_sg"
+    description = "Allow traffic."
+    env        = "prd"
+    rules = {
+      type = "ingress",
+      from_port = "5432",
+      to_port = "5432",
+      protocol = "tcp",
+      cidr_blocks = "10.0.0.0/16"
+    }
+  }
 }
