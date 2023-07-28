@@ -63,41 +63,64 @@ subnets = {
 aws_security_groups = {
 
   vpc_endpoint_sg = {
-    Name       = "prj-dev-vpc-endpoint-sg"
+    vpc_name    = "prj-prd-vpc"
+    Name        = "prj_prd-vpc-endpoint-sg"
     description = "Allow https traffic."
-    env        = "prd"
+    env         = "prd"
     rules = {
-      type = "ingress",
-      from_port = "443",
-      to_port = "443",
-      protocol = "tcp",
+      type        = "ingress",
+      from_port   = "443",
+      to_port     = "443",
+      protocol    = "tcp",
       cidr_blocks = "10.0.0.0/16"
     }
   }
 
   vpc_ec2_sg = {
-    Name       = "prj_dev_ec2_sg"
+    vpc_name    = "prj-prd-vpc"
+    Name        = "prj_prd_ec2_sg"
     description = "Allow all outbound traffic."
-    env        = "prd"
+    env         = "prd"
     rules = {
-      type = "egress",
-      from_port = "0",
-      to_port = "0",
-      protocol = "-1",
+      type        = "egress",
+      from_port   = "0",
+      to_port     = "0",
+      protocol    = "-1",
       cidr_blocks = "0.0.0.0/0"
     }
   }
-  
+
   vpc_db_sg = {
-    Name       = "prj_dev_db_sg"
+    vpc_name    = "prj-prd-vpc"
+    Name        = "prj_prd_db_sg"
     description = "Allow traffic."
-    env        = "prd"
+    env         = "prd"
     rules = {
-      type = "ingress",
-      from_port = "5432",
-      to_port = "5432",
-      protocol = "tcp",
+      type        = "ingress",
+      from_port   = "5432",
+      to_port     = "5432",
+      protocol    = "tcp",
       cidr_blocks = "10.0.0.0/16"
     }
+  }
+}
+
+aws_vpc_endpoint = {
+  ssm = {
+    vpc_endpoint_type   = "Interface"
+    vpc_name            = "prj-prd-vpc"
+    service_name        = "com.amazonaws.ap-northeast-1.ssm"
+    subnet_ids          = "prj-prd-web-subnet-1a"
+    private_dns_enabled = true
+    security_group_ids  = "vpc_endpoint_sg"
+  }
+}
+
+aws_key_pairs = {
+  hanson = {
+    key_name         = "hanson_key.pem"
+    private_key_name = "hanson_key.pem"
+    public_key_name  = "hanson_key.pem.pub"
+    file_permission = "0600"
   }
 }

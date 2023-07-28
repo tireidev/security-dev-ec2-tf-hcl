@@ -94,9 +94,9 @@ locals {
 }
 module "aws_route_table_association_db" {
   source         = "./modules/network/aws_route_table_association"
-  for_each = local.db-subnets-id
+  for_each       = local.db-subnets-id
   route_table_id = module.aws_route_table["prj-prd-db-route_table"].id
-  subnet_id = each.value
+  subnet_id      = each.value
 }
 
 # ========================================================== #
@@ -112,35 +112,40 @@ module "aws_iam" {
 #   2.2. セキュリティグループ構築
 # ========================================================== #
 module "aws_security_group" {
-  source   = "./modules/security/aws_security_group"
-  vpc_id     = module.aws_vpc["prj-prd-vpc"].vpc_id
-  for_each = var.aws_security_groups
-  Name = each.value.Name
+  source      = "./modules/security/aws_security_group"
+  for_each    = var.aws_security_groups
+  vpc_id      = module.aws_vpc[each.value.vpc_name].vpc_id
+  Name        = each.value.Name
   description = each.value.description
-  env = each.value.env
-  rules = each.value.rules
+  env         = each.value.env
+  rules       = each.value.rules
 }
 
 # ========================================================== #
 #   2.3. VPCエンドポイント構築
 # ========================================================== #
-# module "aws_vpc_endpoint" {
-#   source                        = "./modules/network/aws_vpc_endpoint"
-#   u_vpc_id                      = module.aws_vpc["prj-prd-vpc"].vpc_id
-#   u_web_private_subnet_1a_id    = module.aws_subnet.web_private_subnet_1a_id
-#   u_vpc_endpoint_sg_id          = module.aws_security_group.prj_dev_vpc_endpoint_sg_id
-#   u_vpc_endpoint_route_table_id = module.aws_route_table["prj-prd-web-route_table"].id
-# }
+module "aws_vpc_endpoint_interface" {
+  source              = "./modules/network/aws_vpc_endpoint_interface"
+  for_each            = var.aws_vpc_endpoint
+  vpc_endpoint_type   = each.value.vpc_endpoint_type
+  vpc_id              = module.aws_vpc[each.value.vpc_name].vpc_id
+  service_name        = each.value.service_name
+  subnet_ids          = module.aws_subnet[each.value.subnet_ids].id
+  private_dns_enabled = each.value.private_dns_enabled
+  security_group_ids  = module.aws_security_group[each.value.security_group_ids].id
+}
 
 # ========================================================== #
 #   2.4. キーペア構築 ※EC2インスタンスにローカルマシンにてSSH接続でするため
 # ========================================================== #
-# module "aws_key_pairs" {
-#   source             = "./modules/security/aws_key_pairs"
-#   u_key_name         = var.u_key_name
-#   u_private_key_name = var.u_private_key_name
-#   u_public_key_name  = var.u_public_key_name
-# }
+module "aws_key_pairs" {
+  source             = "./modules/security/aws_key_pairs"
+  for_each = var.aws_key_pairs
+  key_name         = each.value.key_name
+  private_key_name = each.value.private_key_name
+  public_key_name  = each.value.public_key_name
+  file_permission = each.value.file_permission
+}
 
 # ========================================================== #
 # 3. EC2インスタンス構築
