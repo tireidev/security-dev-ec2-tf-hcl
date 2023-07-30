@@ -1,57 +1,40 @@
 # ========================================================== #
-# [処理名]
-# EC2インスタンス構築
-# 
 # [概要]
 # EC2インスタンス構築
-#
-# [引数]
-# 変数名: u_web_private_subnet_1a_id
-# 値: プライベートサブネットID
-# 
-# 変数名: u_ec2_sg_id
-# 値: セキュリティグループID
-# 
-# 変数名: u_key_name
-# 値: プライベートキー名
-# 
-# [output]
-# なし
-#
 # ========================================================== #
 
 resource "aws_instance" "server" {
-  ami                    = "ami-00d101850e971728d"
-  instance_type          = "t2.micro"
-  subnet_id              = var.u_web_private_subnet_1a_id
-  vpc_security_group_ids = [var.u_ec2_sg_id]
-  key_name               = var.u_key_name
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = var.vpc_security_group_ids
+  key_name               = var.key_name
   user_data = file("${path.module}/script.sh")
 
   # IAM Role
-  iam_instance_profile = "EC2RoleforSSM"
+  iam_instance_profile = var.iam_instance_profile
 
   # EBSのルートボリューム設定
   root_block_device {
     # ボリュームサイズ(GiB)
-    volume_size = 8
+    volume_size = var.volume_size
     # ボリュームタイプ
-    volume_type = "gp3"
+    volume_type = var.volume_type
     # GP3のIOPS
-    iops = 3000
+    iops = var.iops
     # GP3のスループット
-    throughput = 125
+    throughput = var.throughput
     # EC2終了時に削除
-    delete_on_termination = true
+    delete_on_termination = var.delete_on_termination
 
     # EBSのNameタグ
     tags = {
-      Name = "server_ebs"
+      Name = var.root_block_device_tags_Name
     }
   }
 
   tags = {
-    Env = "dev"
-    Name = "server"
+    Env = var.tags_Env
+    Name = var.tags_Name
   }
 }

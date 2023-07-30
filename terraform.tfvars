@@ -124,3 +124,22 @@ aws_key_pairs = {
     file_permission = "0600"
   }
 }
+
+aws_instance = {
+  prd_web_ec2 = {
+    ami = "ami-00d101850e971728d"
+    instance_type = "t2.micro"
+    subnet_name          = "prj-prd-web-subnet-1a"
+    vpc_security_group_names = ["vpc_ec2_sg","vpc_endpoint_sg"]
+    key_name = "hanson_key.pem"
+    iam_instance_profile = "EC2RoleforSSM"
+    volume_size = 8
+    volume_type = "gp3"
+    iops = 3000
+    throughput = 125
+    delete_on_termination = true
+    root_block_device_tags_Name = "server_ebs"
+    tags_Env = "prd"
+    tags_Name = "prd_web_ec2"
+  }
+}

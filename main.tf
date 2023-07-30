@@ -150,12 +150,25 @@ module "aws_key_pairs" {
 # ========================================================== #
 # 3. EC2インスタンス構築
 # ========================================================== #
-# module "ec2" {
-#   source                     = "./modules/server/web"
-#   u_web_private_subnet_1a_id = module.aws_subnet.web_private_subnet_1a_id
-#   u_ec2_sg_id                = module.aws_security_group.prj_dev_ec2_sg_id
-#   u_key_name                 = module.aws_key_pairs.key_name
-# }
+module "ec2" {
+  source                     = "./modules/server/web"
+  for_each = var.aws_instance
+  ami = each.value.ami
+  instance_type = each.value.instance_type
+  subnet_id = module.aws_subnet[each.value.subnet_name].id
+  vpc_security_group_ids                = [for sg_name in each.value.vpc_security_group_names : module.aws_security_group[sg_name].id]
+  key_name                 = each.value.key_name
+  iam_instance_profile = each.value.iam_instance_profile
+  volume_size = each.value.volume_size
+  volume_type = each.value.volume_type
+  iops = each.value.iops
+  throughput = each.value.throughput
+  delete_on_termination = each.value.delete_on_termination
+  root_block_device_tags_Name = each.value.root_block_device_tags_Name
+  tags_Env = each.value.tags_Env
+  tags_Name = each.value.tags_Name
+
+}
 
 # ========================================================== #
 # 4. RDSインスタンス構築

@@ -120,3 +120,22 @@ variable "aws_key_pairs" {
     }
   }
 }
+
+variable "aws_instance" {
+  type = map(object({
+    ami = string
+    instance_type = string
+    subnet_name = string
+    vpc_security_group_names = set(string)
+    key_name = string
+    iam_instance_profile = string
+    volume_size = number
+    volume_type = string
+    iops = number
+    throughput = number
+    delete_on_termination = bool
+    root_block_device_tags_Name = string
+    tags_Env = string
+    tags_Name = string
+  }))
+}
