@@ -105,37 +105,61 @@ variable "aws_vpc_endpoint" {
 
 variable "aws_key_pairs" {
   type = map(object({
-    key_name = string
+    key_name         = string
     private_key_name = string
-    public_key_name = string
-    file_permission = string
+    public_key_name  = string
+    file_permission  = string
   }))
   description = ""
   default = {
     default_object = {
       key_name         = "hanson_key.pem"
       private_key_name = "hanson_key.pem"
-      public_key_name = "hanson_key.pem.pub"
-      file_permission = "0600"
+      public_key_name  = "hanson_key.pem.pub"
+      file_permission  = "0600"
     }
   }
 }
 
 variable "aws_instance" {
   type = map(object({
-    ami = string
-    instance_type = string
-    subnet_name = string
-    vpc_security_group_names = set(string)
-    key_name = string
-    iam_instance_profile = string
-    volume_size = number
-    volume_type = string
-    iops = number
-    throughput = number
-    delete_on_termination = bool
+    ami                         = string
+    instance_type               = string
+    subnet_name                 = string
+    vpc_security_group_names    = set(string)
+    key_name                    = string
+    iam_instance_profile        = string
+    volume_size                 = number
+    volume_type                 = string
+    iops                        = number
+    throughput                  = number
+    delete_on_termination       = bool
     root_block_device_tags_Name = string
-    tags_Env = string
-    tags_Name = string
+    tags_Env                    = string
+    tags_Name                   = string
+  }))
+}
+
+variable "aws_db_subnet_group" {
+  type = map(object({
+    name         = string
+    subnet_names = set(string)
+  }))
+}
+
+variable "aws_db_instance" {
+  type = map(object({
+    identifier             = string
+    allocated_storage      = number
+    storage_type           = string
+    engine                 = string
+    engine_version         = string
+    instance_class         = string
+    db_name                = string
+    username               = string
+    password               = string
+    vpc_security_group_names = set(string)
+    db_subnet_group_name   = string
+    skip_final_snapshot    = bool
   }))
 }

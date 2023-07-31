@@ -139,43 +139,60 @@ module "aws_vpc_endpoint_interface" {
 #   2.4. キーペア構築 ※EC2インスタンスにローカルマシンにてSSH接続でするため
 # ========================================================== #
 module "aws_key_pairs" {
-  source             = "./modules/security/aws_key_pairs"
-  for_each = var.aws_key_pairs
+  source           = "./modules/security/aws_key_pairs"
+  for_each         = var.aws_key_pairs
   key_name         = each.value.key_name
   private_key_name = each.value.private_key_name
   public_key_name  = each.value.public_key_name
-  file_permission = each.value.file_permission
+  file_permission  = each.value.file_permission
 }
 
 # ========================================================== #
 # 3. EC2インスタンス構築
 # ========================================================== #
 module "ec2" {
-  source                     = "./modules/server/web"
-  for_each = var.aws_instance
-  ami = each.value.ami
-  instance_type = each.value.instance_type
-  subnet_id = module.aws_subnet[each.value.subnet_name].id
-  vpc_security_group_ids                = [for sg_name in each.value.vpc_security_group_names : module.aws_security_group[sg_name].id]
-  key_name                 = each.value.key_name
-  iam_instance_profile = each.value.iam_instance_profile
-  volume_size = each.value.volume_size
-  volume_type = each.value.volume_type
-  iops = each.value.iops
-  throughput = each.value.throughput
-  delete_on_termination = each.value.delete_on_termination
+  source                      = "./modules/server/web"
+  for_each                    = var.aws_instance
+  ami                         = each.value.ami
+  instance_type               = each.value.instance_type
+  subnet_id                   = module.aws_subnet[each.value.subnet_name].id
+  vpc_security_group_ids      = [for sg_name in each.value.vpc_security_group_names : module.aws_security_group[sg_name].id]
+  key_name                    = each.value.key_name
+  iam_instance_profile        = each.value.iam_instance_profile
+  volume_size                 = each.value.volume_size
+  volume_type                 = each.value.volume_type
+  iops                        = each.value.iops
+  throughput                  = each.value.throughput
+  delete_on_termination       = each.value.delete_on_termination
   root_block_device_tags_Name = each.value.root_block_device_tags_Name
-  tags_Env = each.value.tags_Env
-  tags_Name = each.value.tags_Name
+  tags_Env                    = each.value.tags_Env
+  tags_Name                   = each.value.tags_Name
 
 }
 
 # ========================================================== #
 # 4. RDSインスタンス構築
 # ========================================================== #
-# module "rds" {
-#   source                  = "./modules/server/db"
-#   u_db_private_subnet_1a_id     = module.aws_subnet.db_private_subnet_1a_id
-#   u_db_private_subnet_1c_id     = module.aws_subnet.db_private_subnet_1c_id
-#   u_db_sg_id             = module.aws_security_group.prj_dev_db_sg_id
-# }
+module "aws_db_subnet_group" {
+  source     = "./modules/server/rds/aws_db_subnet_group"
+  for_each   = var.aws_db_subnet_group
+  name       = each.value.name
+  subnet_ids = [for subnet_name in each.value.subnet_names : module.aws_subnet[subnet_name].id]
+}
+
+module "rds" {
+  source                 = "./modules/server/rds/aws_db_instance"
+  for_each               = var.aws_db_instance
+  identifier             = each.value.identifier
+  allocated_storage      = each.value.allocated_storage
+  storage_type           = each.value.storage_type
+  engine                 = each.value.engine
+  engine_version         = each.value.engine_version
+  instance_class         = each.value.instance_class
+  db_name                = each.value.db_name
+  username               = each.value.username
+  password               = each.value.password
+  vpc_security_group_ids = [for security_group_name in each.value.vpc_security_group_names : module.aws_security_group[security_group_name].id]
+  db_subnet_group_name   = each.value.db_subnet_group_name
+  skip_final_snapshot    = each.value.skip_final_snapshot
+}

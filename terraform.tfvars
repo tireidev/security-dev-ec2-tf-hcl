@@ -121,25 +121,49 @@ aws_key_pairs = {
     key_name         = "hanson_key.pem"
     private_key_name = "hanson_key.pem"
     public_key_name  = "hanson_key.pem.pub"
-    file_permission = "0600"
+    file_permission  = "0600"
   }
 }
 
 aws_instance = {
   prd_web_ec2 = {
-    ami = "ami-00d101850e971728d"
-    instance_type = "t2.micro"
-    subnet_name          = "prj-prd-web-subnet-1a"
-    vpc_security_group_names = ["vpc_ec2_sg","vpc_endpoint_sg"]
-    key_name = "hanson_key.pem"
-    iam_instance_profile = "EC2RoleforSSM"
-    volume_size = 8
-    volume_type = "gp3"
-    iops = 3000
-    throughput = 125
-    delete_on_termination = true
+    ami                         = "ami-00d101850e971728d"
+    instance_type               = "t2.micro"
+    subnet_name                 = "prj-prd-web-subnet-1a"
+    vpc_security_group_names    = ["vpc_ec2_sg", "vpc_endpoint_sg"]
+    key_name                    = "hanson_key.pem"
+    iam_instance_profile        = "EC2RoleforSSM"
+    volume_size                 = 8
+    volume_type                 = "gp3"
+    iops                        = 3000
+    throughput                  = 125
+    delete_on_termination       = true
     root_block_device_tags_Name = "server_ebs"
-    tags_Env = "prd"
-    tags_Name = "prd_web_ec2"
+    tags_Env                    = "prd"
+    tags_Name                   = "prd_web_ec2"
+  }
+}
+
+aws_db_subnet_group = {
+  prd-db-postgres = {
+    name         = "prd-db-postgres"
+    subnet_names = ["prj-prd-db-subnet-1a", "prj-prd-db-subnet-1c"]
+  }
+}
+
+aws_db_instance = {
+  prd-db-postgres = {
+    identifier               = "prd-db-postgres"
+    allocated_storage        = 20
+    storage_type             = "gp2"
+    engine                   = "postgres"
+    engine_version           = "14.5"
+    instance_class           = "db.t4g.micro"
+    db_name                  = "prddb"
+    username                 = "test"
+    password                 = "postgresql"
+    vpc_security_group_names = ["vpc_db_sg"]
+    db_subnet_group_name     = "prd-db-postgres"
+    skip_final_snapshot      = true
   }
 }
