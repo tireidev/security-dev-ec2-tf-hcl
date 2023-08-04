@@ -62,7 +62,7 @@ module "aws_route_table" {
   for_each = var.route_tables
   Name     = each.value.Name
   env      = each.value.env
-  vpc_id   = module.aws_vpc["${each.value.vpc_name}"].vpc_id
+  vpc_id   = module.aws_vpc[each.value.vpc_name].vpc_id
 }
 
 # ========================================================== #
@@ -71,32 +71,28 @@ module "aws_route_table" {
 module "aws_subnet" {
   source     = "./modules/network/aws_subnet"
   for_each   = var.subnets
-  vpc_id     = module.aws_vpc["prj-prd-vpc"].vpc_id
+  vpc_id     = module.aws_vpc[each.value.vpc_name].vpc_id
   cidr_block = each.value.cidr_block
   env        = each.value.env
   Name       = each.value.Name
+  availability_zone = each.value.availability_zone
 }
 
 # ========================================================== #
 #   1.4. RouteTableとPublic Subnetの紐付け
 # ========================================================== #
 module "aws_route_table_association_web" {
+  for_each       = var.aws_route_table_association_web
   source         = "./modules/network/aws_route_table_association"
-  route_table_id = module.aws_route_table["prj-prd-web-route_table"].id
-  subnet_id      = module.aws_subnet["prj-prd-web-subnet-1a"].id
+  route_table_id = module.aws_route_table[each.value.route_table_name].id
+  subnet_id      = module.aws_subnet[each.value.subnet_name].id
 }
 
-locals {
-  db-subnets-id = {
-    db-subnets-1a = module.aws_subnet["prj-prd-db-subnet-1a"].id,
-    db-subnets-1c = module.aws_subnet["prj-prd-db-subnet-1c"].id
-  }
-}
 module "aws_route_table_association_db" {
   source         = "./modules/network/aws_route_table_association"
-  for_each       = local.db-subnets-id
-  route_table_id = module.aws_route_table["prj-prd-db-route_table"].id
-  subnet_id      = each.value
+  for_each       = var.aws_route_table_association_db
+  route_table_id = module.aws_route_table[each.value.route_table_name].id
+  subnet_id      = module.aws_subnet[each.value.subnet_name].id
 }
 
 # ========================================================== #
@@ -126,13 +122,22 @@ module "aws_security_group" {
 # ========================================================== #
 module "aws_vpc_endpoint_interface" {
   source              = "./modules/network/aws_vpc_endpoint_interface"
-  for_each            = var.aws_vpc_endpoint
+  for_each            = var.aws_vpc_endpoint_interface
   vpc_endpoint_type   = each.value.vpc_endpoint_type
   vpc_id              = module.aws_vpc[each.value.vpc_name].vpc_id
   service_name        = each.value.service_name
   subnet_ids          = module.aws_subnet[each.value.subnet_ids].id
   private_dns_enabled = each.value.private_dns_enabled
   security_group_ids  = module.aws_security_group[each.value.security_group_ids].id
+}
+
+module "aws_vpc_endpoint_gateway" {
+  source            = "./modules/network/aws_vpc_endpoint_gateway"
+  for_each          = var.aws_vpc_endpoint_gateway
+  vpc_endpoint_type = each.value.vpc_endpoint_type
+  vpc_id            = module.aws_vpc[each.value.vpc_name].vpc_id
+  service_name      = each.value.service_name
+  route_table_ids   = [for name in each.value.route_table_names : module.aws_route_table[name].id]
 }
 
 # ========================================================== #

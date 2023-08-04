@@ -37,11 +37,6 @@ variable "route_tables" {
     Name     = string
   }))
   description = ""
-  default = {
-    vpc_name = null
-    env      = null
-    Name     = null
-  }
 }
 
 variable "subnets" {
@@ -49,14 +44,28 @@ variable "subnets" {
     cidr_block = string
     env        = string
     Name       = string
+    vpc_name   = string
+    availability_zone = string
   }))
   description = ""
-  default = {
-    cidr_block = null
-    env        = null
-    Name       = null
-  }
 }
+
+variable "aws_route_table_association_web" {
+  type = map(object({
+    route_table_name = string
+    subnet_name      = string
+  }))
+  description = ""
+}
+
+variable "aws_route_table_association_db" {
+  type = map(object({
+    route_table_name = string
+    subnet_name      = string
+  }))
+  description = ""
+}
+
 variable "aws_security_groups" {
   type = map(object({
     vpc_name    = string
@@ -81,7 +90,7 @@ variable "aws_security_groups" {
   }
 }
 
-variable "aws_vpc_endpoint" {
+variable "aws_vpc_endpoint_interface" {
   type = map(object({
     vpc_endpoint_type   = string
     vpc_name            = string
@@ -91,16 +100,16 @@ variable "aws_vpc_endpoint" {
     security_group_ids  = string
   }))
   description = ""
-  default = {
-    default_object = {
-      vpc_endpoint_type   = "Interface"
-      vpc_name            = null
-      service_name        = null
-      subnet_ids          = null
-      private_dns_enabled = false
-      security_group_ids  = null
-    }
-  }
+}
+
+variable "aws_vpc_endpoint_gateway" {
+  type = map(object({
+    vpc_endpoint_type = string
+    vpc_name          = string
+    service_name      = string
+    route_table_names = set(string)
+  }))
+  description = ""
 }
 
 variable "aws_key_pairs" {
@@ -145,21 +154,22 @@ variable "aws_db_subnet_group" {
     name         = string
     subnet_names = set(string)
   }))
+    description = ""
 }
 
 variable "aws_db_instance" {
   type = map(object({
-    identifier             = string
-    allocated_storage      = number
-    storage_type           = string
-    engine                 = string
-    engine_version         = string
-    instance_class         = string
-    db_name                = string
-    username               = string
-    password               = string
+    identifier               = string
+    allocated_storage        = number
+    storage_type             = string
+    engine                   = string
+    engine_version           = string
+    instance_class           = string
+    db_name                  = string
+    username                 = string
+    password                 = string
     vpc_security_group_names = set(string)
-    db_subnet_group_name   = string
-    skip_final_snapshot    = bool
+    db_subnet_group_name     = string
+    skip_final_snapshot      = bool
   }))
 }

@@ -47,16 +47,39 @@ subnets = {
     cidr_block = "10.0.1.0/24"
     env        = "prd"
     Name       = "prj-prd-web-subnet-1a"
+    vpc_name   = "prj-prd-vpc"
+    availability_zone = "ap-northeast-1a"
   }
   prj-prd-db-subnet-1a = {
     cidr_block = "10.0.2.0/24"
     env        = "prd"
     Name       = " prj-prd-db-subnet-1a"
+    vpc_name   = "prj-prd-vpc"
+    availability_zone = "ap-northeast-1a"
   }
   prj-prd-db-subnet-1c = {
     cidr_block = "10.0.3.0/24"
     env        = "prd"
     Name       = "prj-prd-db-subnet-1c"
+    vpc_name   = "prj-prd-vpc"
+    availability_zone = "ap-northeast-1c"
+  }
+}
+
+aws_route_table_association_web = {
+  web_route_1a = {
+    route_table_name = "prj-prd-web-route_table"
+    subnet_name      = "prj-prd-web-subnet-1a"
+  }
+}
+aws_route_table_association_db = {
+  db_route_1a = {
+    route_table_name = "prj-prd-db-route_table"
+    subnet_name      = "prj-prd-db-subnet-1a"
+  }
+  db_route_1c = {
+    route_table_name = "prj-prd-db-route_table"
+    subnet_name      = "prj-prd-db-subnet-1c"
   }
 }
 
@@ -105,7 +128,7 @@ aws_security_groups = {
   }
 }
 
-aws_vpc_endpoint = {
+aws_vpc_endpoint_interface = {
   ssm = {
     vpc_endpoint_type   = "Interface"
     vpc_name            = "prj-prd-vpc"
@@ -113,6 +136,15 @@ aws_vpc_endpoint = {
     subnet_ids          = "prj-prd-web-subnet-1a"
     private_dns_enabled = true
     security_group_ids  = "vpc_endpoint_sg"
+  }
+}
+
+aws_vpc_endpoint_gateway = {
+  ssm = {
+    vpc_endpoint_type = "Gateway"
+    vpc_name          = "prj-prd-vpc"
+    service_name      = "com.amazonaws.ap-northeast-1.s3"
+    route_table_names = ["prj-prd-web-route_table"]
   }
 }
 
@@ -145,8 +177,8 @@ aws_instance = {
 }
 
 aws_db_subnet_group = {
-  prd-db-postgres = {
-    name         = "prd-db-postgres"
+  prd-db-subnet-postgres = {
+    name         = "prd-db-subnet-postgres"
     subnet_names = ["prj-prd-db-subnet-1a", "prj-prd-db-subnet-1c"]
   }
 }
@@ -163,7 +195,7 @@ aws_db_instance = {
     username                 = "test"
     password                 = "postgresql"
     vpc_security_group_names = ["vpc_db_sg"]
-    db_subnet_group_name     = "prd-db-postgres"
+    db_subnet_group_name     = "prd-db-subnet-postgres"
     skip_final_snapshot      = true
   }
 }
